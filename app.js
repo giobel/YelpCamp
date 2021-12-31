@@ -4,6 +4,8 @@ const path = require('path')
 const mongoose = require ('mongoose');
 const Campground = require ('./models/campground')
 const methodOverride = require('method-override');
+const morgan = require('morgan');
+const ejsMate = require('ejs-mate');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 
@@ -18,6 +20,17 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'))
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'));
+app.engine('ejs', ejsMate);
+
+//runs on every request
+const veryPassaword = (req, res, next)=>{
+    const {password} = req.query;
+    //http://localhost:3000/?password=test
+    if (password === 'test'){
+        next();
+    }
+    res.send('Sorry wrong password')
+};
 
 app.get('/', (req, res) =>{
     //res.send("Hello from me")
@@ -62,6 +75,16 @@ app.delete('/campgrounds/:id', async (req, res)=>{
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
 })
+
+app.get('/secret', veryPassaword, (req, res) =>{
+    res.send('my secret')
+})
+
+app.use((req, res)=>{
+    res.status(404).send('Not found')
+})
+
+
 
 app.listen(3000, () =>{
     console.log('Listening on port 3000')
