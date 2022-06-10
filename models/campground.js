@@ -6,7 +6,13 @@ const CampgroundSchema = new Schema({
     image: String,
     price: Number,
     description: String,
-    location: String
+    location: String,
+    //there can be multiple reviews per campground -> 
+    //create their own model and only store the object id 
+    reviews: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Review' //model name
+    }]
 })
 
 module.exports = mongoose.model('Campground', CampgroundSchema);
